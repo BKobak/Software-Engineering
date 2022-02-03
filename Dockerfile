@@ -1,23 +1,14 @@
-# Specify base image (NodeJS)
-FROM node:latest
+# syntax=docker/dockerfile:1
 
-# Update the Ubuntu image
-RUN apt-get -y update
+FROM node:12.18.1
+ENV NODE_ENV=production
 
-# Create another image layer on top of base to install requirements
-FROM base AS requirements
+WORKDIR /app
 
-# Specify another image (MySQL)
-FROM mysql:latest
+COPY ["package.json", "package-lock.json*", "./"]
 
-# Install the requirements
-RUN pip3 install -r requirements.txt
+RUN npm install --production
 
-# Create an intermediate image layer for testing purpose
-FROM requirements AS test
+COPY . .
 
-# Create the build context
-COPY /usr/src/coursework /desktop/coursework
-
-# Run script after image is built
-CMD [ "cmd", "project.js" ]
+CMD [ "node", "server.js" ]
